@@ -133,6 +133,7 @@ EOF
 
 kafka() {
 assert_not_empty "$KAFKA_BROKERS" "KAFKA_BROKERS required"
+#KAFKA_BROKERS=$(curl -s "http://tcloud-dev.weizhipin.com/api/node/kafka/addressDeploy/get?nodeName=$NODE_NAME&clusterFlag=gt")
 KAFKA_BROKERS=$(echo $KAFKA_BROKERS|awk -F, '{for(i=1;i<=NF;i++){printf "\"%s\",", $i}}')
 KAFKA_BROKERS=${KAFKA_BROKERS%,}
 
