@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tomcat
+  labels:
+    com.aliyun.access.app: tomcat-1111
+    app: tomcat-55555
+spec:
+  containers:
+    - name: tomcat
+      image: "tomcat:7.0"
+      args:
+        - /bin/sh
+        - -c
+        - >
+          i=0;
+          while true;
+          do
+            echo "111111" >> /usr/local/tomcat/logs/catalina.1.log;
+            i=$((i+1));
+            sleep 1;
+          done
+      env:
+        # 1、stdout为约定关键字，表示采集标准输出日志
+        # 2、配置标准输出日志采集到ES的catalina索引下
+        - name: TWL_LABEL_group
+          value: "arsenal-web.prod"
+        - name: TWL_LABEL_app
+          value: "arsenal-web"
+        - name: TWL_LABEL_env
+          value: "prod"
+        - name: TWL_LABEL_system
+          value: "arsenal"
+        - name: aliyun_logs_catalina
+          value: "stdout"
+        # 1、配置采集容器内文件日志，支持通配符
+        # 2、配置该日志采集到ES的access索引下
+        - name: aliyun_logs_access
+          value: "/usr/local/tomcat/logs/catalina.*.log"
+      # 容器内文件日志路径需要配置emptyDir
+      volumeMounts:
+        - name: tomcat-log
+          mountPath: /usr/local/tomcat/logs
+      volumeMounts:
+        - name: system-log
+          mountPath: /usr/local/tomcat/logs
+  volumes:
+    - name: tomcat-log
+      emptyDir: {}
+    - name: system-log
+      emptyDir: {}
